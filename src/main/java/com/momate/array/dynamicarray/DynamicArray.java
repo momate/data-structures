@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 public class DynamicArray <T> implements Iterable<T>{
 
+    private static final int DEFAULT_CAPACITY = 16;
     private T[] arr;
     private int len = 0;
     private int capacity = 0;
@@ -15,11 +16,11 @@ public class DynamicArray <T> implements Iterable<T>{
     }
 
     public DynamicArray(){
-        this(16);
+        this(DEFAULT_CAPACITY);
     }
 
     public int size(){
-        return len;
+        return this.len;
     }
 
     public boolean isEmpty(){
@@ -27,53 +28,42 @@ public class DynamicArray <T> implements Iterable<T>{
     }
 
     public T get(int index){
-        return arr[index];
+        return this.arr[index];
     }
 
     public void set(int index, T element){
-        arr[index] = element;
+        this.arr[index] = element;
     }
 
     public void clear(){
-        for (int i = 0; i< capacity; i++){
+        for (int i = 0; i< this.capacity; i++){
             arr[i] = null;
         }
         len = 0;
     }
 
-    public void add(T element){
-        if(len+1 >= capacity){
-            if(capacity == 0){
-                capacity = 1;
-            }else {
-                capacity *= 2;
-            }
-            T[] newArr = (T[]) new Object[capacity];
-            for (int i = 0; i < len; i++){
-                newArr[i] = arr[i];
-            }
-            arr = newArr;
-        }
-
-        arr[len++] = element;
-
+    public boolean add(T element){
+    ensureCapacity(this.len + 1);
+    this.arr[this.len++] = element;
+    return true;
     }
 
     public void add(T element, int index){
-        if(index < 0) throw new ArrayIndexOutOfBoundsException();
+            indexCheck(index);
+            ensureCapacity(this.len + 1);
 
-            for (int i = len; i > index; i--) {
+            for (int i = this.len; i > index; i--) {
                 arr[i] = arr[i - 1];
             }
             arr[index] = element;
-            len++;
+            this.len++;
     }
 
     public T remove(int index){
-        if(index >= len || index < 0) throw new ArrayIndexOutOfBoundsException();
+        indexCheck(index);
         T data = arr[index];
-        T[] newArr = (T[]) new Object[len-1];
-        for (int i=0, j = 0; i < len; i++, j++){
+        T[] newArr = (T[]) new Object[this.len-1];
+        for (int i=0, j = 0; i < this.len; i++, j++){
             if(i == index){
                 j--;
             }else{
@@ -81,7 +71,7 @@ public class DynamicArray <T> implements Iterable<T>{
             }
         }
         arr = newArr;
-        capacity = --len;
+        capacity = --this.len;
         return data;
     }
 
@@ -106,6 +96,20 @@ public class DynamicArray <T> implements Iterable<T>{
 
     public boolean contains(Object o){
         return indexOf(o) != -1;
+    }
+
+    public void ensureCapacity(int minCapacity){
+        if(minCapacity >= capacity) {
+           int newCapacity = (capacity * 3) / 2;
+            T[] newArr = (T[]) new Object[newCapacity];
+            for (int i = 0; i < size(); i++){
+                newArr[i] = arr[i];
+            }
+        }
+    }
+
+    private void indexCheck(int index){
+        if(index < 0 || index > this.size()) throw new IndexOutOfBoundsException();
     }
 
     @Override
