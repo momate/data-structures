@@ -20,12 +20,12 @@ public class DoublyLinkedList<T> implements Iterable<T> {
         }
     }
 
-    public DoublyLinkedList(int size) {
+    public DoublyLinkedList() {
         this.size = 0;
     }
 
     public boolean add(T element) {
-        addFirst(element);
+        addLast(element);
         return true;
     }
 
@@ -35,11 +35,11 @@ public class DoublyLinkedList<T> implements Iterable<T> {
             this.head = new Node(element, null, null);
         } else {
 
-            Node last = head.next;
+            Node last = this.head;
             while (last.next != null) {
                 last = last.next;
             }
-            Node<T> newNode = new Node(element, last, null);
+            last.next = new Node<T>(element, last, null);
         }
         ++this.size;
     }
@@ -133,15 +133,24 @@ public class DoublyLinkedList<T> implements Iterable<T> {
 
     public T removeLast() {
         isHeadExist();
-        Node<T> last = this.head;
-        while (last.next != null) {
-            last = last.next;
+        T value;
+        if(size == 1){
+            value = this.head.data;
+            removeFirst();
+            return value;
+        }else{
+            Node<T> last = this.head;
+            while(last.next != null){
+                last = last.next;
+            }
+            Node beforeLast= last.prev;
+            value = last.data;
+            last.prev = null;
+            last.data = null;
+            beforeLast.next = null;
+            --this.size;
         }
-        Node<T> beforeLast = last.prev;
-        beforeLast.next = null;
-        last.prev = null;
-        --size;
-        return last.data;
+        return value;
     }
 
     public int size() {
